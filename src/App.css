@@ -77,3 +77,35 @@ button {
   text-decoration: underline;
   text-decoration-thickness: 3px;
 }
+.results {
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+}
+
+.results h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.results-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.results-stats span {
+  font-size: 14px;
+  color: #666;
+}
+
+.results-stats strong {
+  font-size: 28px;
+}

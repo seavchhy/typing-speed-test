@@ -5,12 +5,20 @@ function App() {
   const [typedText, setTypedText] = useState('')
   const [time, setTime] = useState(60)
   const [isRunning, setIsRunning] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
 
   const targetText = 'The quick brown fox jumps over the lazy dog.'
+  const testFinished = time === 0 || typedText === targetText
+ 
+  const handleStart = () => {
+  setHasStarted(true)
+  setIsRunning(true)
+  }
   const handleRestart = () => {
       setTypedText('')
-      setIsRunning(false)
       setTime(60)
+      setIsRunning(false)
+      setHasStarted(false)
   }
 
   useEffect(() => {
@@ -73,9 +81,6 @@ function App() {
           <strong>{calculateAccuracy()}%</strong>
         </div>
       </div>
-      {time === 0 && (
-        <p className="finished-message">Time's up!</p>
-      )}
 
       <div className="text-display">
         {targetText.split('').map((character, index) => {
@@ -111,16 +116,50 @@ function App() {
       <textarea
         placeholder="Start typing here..."
         value={typedText}
-        disabled={time === 0}
+        disabled={!hasStarted || time === 0  || typedText === targetText}
         onChange={(e) => {
-          setTypedText(e.target.value)
-          if (!isRunning && time > 0) {
-            setIsRunning(true)
+          const value = e.target.value
+          setTypedText(value)
+
+          if (value === targetText) {
+            setIsRunning(false)
           }
         }}
       />
+      {testFinished && hasStarted && (
+        <div className="results">
+          <h2>Test Complete!</h2>
 
-      <button onClick={handleRestart}>Restart</button>
+          <div className="results-stats">
+            <div>
+              <span>WPM</span>
+              <strong>{calculateWPM()}</strong>
+            </div>
+
+            <div>
+              <span>Accuracy</span>
+              <strong>{calculateAccuracy()}%</strong>
+            </div>
+
+            <div>
+              <span>Characters</span>
+              <strong>{typedText.length}</strong>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!hasStarted && (
+        <button type="button" onClick={handleStart}>
+          Start Test
+        </button>
+      )}
+
+      {testFinished && hasStarted && (
+        <button type="button" onClick={handleRestart}>
+          Try Again
+        </button>
+      )}
     </div>
   );
 }
