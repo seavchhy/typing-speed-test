@@ -1,26 +1,41 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
 .app {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  text-align: center;
+  width: 90%;
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 40px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
 h1 {
-  font-size: 40px;
-  margin-bottom: 40px;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 35px;
+  font-size: 36px;
 }
 
 .stats {
   display: flex;
-  justify-content: center;
-  gap: 60px;
-  margin-bottom: 40px;
+  justify-content: space-around;
+  margin-bottom: 30px;
 }
 
 .stats div {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: center;
+  gap: 6px;
 }
 
 .stats span {
@@ -42,25 +57,7 @@ h1 {
   text-align: left;
   letter-spacing: 0.5px;
 }
-textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 15px;
-  box-sizing: border-box;
-  font-size: 18px;
-  resize: vertical;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-}
 
-button {
-  margin-top: 20px;
-  padding: 12px 25px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
 .correct {
   color: green;
 }
@@ -68,20 +65,54 @@ button {
 .incorrect {
   color: red;
 }
-.finished-message {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
+
 .current {
   text-decoration: underline;
   text-decoration-thickness: 3px;
 }
+
+textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 15px;
+  font-size: 18px;
+  font-family: inherit;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  resize: vertical;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: #333;
+}
+
+textarea:disabled {
+  background-color: #eee;
+  cursor: not-allowed;
+}
+
+button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
 .results {
   margin-top: 30px;
   padding: 25px;
   border-radius: 12px;
   background-color: #f5f5f5;
+  text-align: center;
 }
 
 .results h2 {
@@ -108,4 +139,74 @@ button {
 
 .results-stats strong {
   font-size: 28px;
+}
+@media (max-width: 600px) {
+  .app {
+    width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .stats strong {
+    font-size: 22px;
+  }
+
+  .text-display {
+    padding: 18px;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  textarea {
+    min-height: 120px;
+    font-size: 16px;
+  }
+
+  .results-stats {
+    gap: 20px;
+  }
+
+  .results-stats strong {
+    font-size: 22px;
+  }
+}
+.difficulty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.difficulty span {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.difficulty button {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #eee;
+}
+
+.difficulty button.selected {
+  background-color: #333;
+  color: white;
+}
+
+.difficulty button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

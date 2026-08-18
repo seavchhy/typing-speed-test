@@ -6,17 +6,56 @@ function App() {
   const [time, setTime] = useState(60)
   const [isRunning, setIsRunning] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [difficulty, setDifficulty] = useState('easy')
 
-  const targetText = 'The quick brown fox jumps over the lazy dog.'
+  const passages = {
+    easy: [
+      'I like learning new things.',
+      'The sun is shining today.',
+      'Practice makes you better.',
+      'Coding can be fun.'
+    ],
+
+    medium: [
+      'Learning to code takes practice and patience.',
+      'React makes it easier to build interactive websites.',
+      'Every small step brings you closer to your goal.',
+      'Good software requires careful testing.'
+    ],
+
+    hard: [
+      'Building reliable software requires patience, testing, and continuous improvement.',
+      'Successful developers understand that solving problems is more important than memorizing code.',
+      'Modern applications require developers to think carefully about performance, security, and usability.',
+      'Writing clean and maintainable code becomes increasingly important as projects grow larger.'
+    ]
+  }
+  const [targetText, setTargetText] = useState(passages.easy[0])
   const testFinished = time === 0 || typedText === targetText
  
   const handleStart = () => {
-  setHasStarted(true)
-  setIsRunning(true)
+    setTypedText('')
+    setElapsedTime(0)
+    setTargetText(getRandomPassage(targetText))
+    setHasStarted(true)
+    setIsRunning(true)
+  }
+  const getRandomPassage = (currentPassage) => {
+  const currentPassages = passages[difficulty]
+
+    let randomIndex
+
+    do {
+      randomIndex = Math.floor(Math.random() * currentPassages.length)
+    } while (currentPassages[randomIndex] === currentPassage)
+
+    return currentPassages[randomIndex]
   }
   const handleRestart = () => {
       setTypedText('')
       setTime(60)
+      setElapsedTime(0)
       setIsRunning(false)
       setHasStarted(false)
   }
@@ -28,6 +67,7 @@ function App() {
 
     const timer = setInterval(() => {
       setTime((currentTime) => currentTime - 1)
+      setElapsedTime((currentTime) => currentTime + 1)
     }, 1000)
 
     return () => clearInterval(timer)
@@ -40,30 +80,65 @@ function App() {
 
     let correctCharacters = 0
 
-    for (let i = 0; i < typedText.length; i++) {
+    const charactersToCheck = Math.min(
+      typedText.length,
+      targetText.length
+    )
+
+    for (let i = 0; i < charactersToCheck; i++) {
       if (typedText[i] === targetText[i]) {
         correctCharacters++
       }
     }
 
-    return Math.round((correctCharacters / typedText.length) * 100)
- }
-  const calculateWPM = () => {
-  const elapsedTime = 60 - time
-
-  if (elapsedTime === 0 || typedText.length === 0) {
-    return 0
+    return Math.round(
+      (correctCharacters / typedText.length) * 100
+    )
   }
+  const calculateWPM = () => {
+    if (elapsedTime === 0 || typedText.length === 0) {
+      return 0
+    }
 
-  const minutes = elapsedTime / 60
-  const words = typedText.length / 5
+    const minutes = elapsedTime / 60
+    const words = typedText.length / 5
 
-  return Math.round(words / minutes)
-}
+    return Math.round(words / minutes)
+  }
 
   return (
     <div className="app">
       <h1>Speed Typing Test</h1>
+      <div className="difficulty">
+        <span>Difficulty:</span>
+
+        <button
+          type="button"
+          className={difficulty === 'easy' ? 'selected' : ''}
+          disabled={hasStarted}
+          onClick={() => setDifficulty('easy')}
+        >
+          Easy
+        </button>
+
+        <button
+          type="button"
+          className={difficulty === 'medium' ? 'selected' : ''}
+          disabled={hasStarted}
+          onClick={() => setDifficulty('medium')}
+        >
+          Medium
+        </button>
+
+        <button
+          type="button"
+          className={difficulty === 'hard' ? 'selected' : ''}
+          disabled={hasStarted}
+          onClick={() => setDifficulty('hard')}
+        >
+          Hard
+        </button>
+      </div>
 
       <div className="stats">
         <div>
@@ -79,6 +154,15 @@ function App() {
         <div>
           <span>Accuracy</span>
           <strong>{calculateAccuracy()}%</strong>
+        </div>
+
+        <div>
+          <span>Characters</span>
+          <strong>{typedText.length}</strong>
+        </div>
+        <div>
+          <span>Time Taken</span>
+          <strong>{elapsedTime}s</strong>
         </div>
       </div>
 
