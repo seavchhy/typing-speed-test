@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 function App() {
@@ -8,6 +8,8 @@ function App() {
   const [hasStarted, setHasStarted] = useState(false)
   const [elapsedTime, setElapsedTime] = useState(0)
   const [difficulty, setDifficulty] = useState('easy')
+  const [showPassage, setShowPassage] = useState(false)
+  const textareaRef = useRef(null)
 
   const passages = {
     easy: [
@@ -32,13 +34,18 @@ function App() {
     ]
   }
   const [targetText, setTargetText] = useState(passages.easy[0])
-  const testFinished = time === 0 || typedText === targetText
+  const testFinished = time === 0 || typedText.length === targetText.length  
+  const progress = Math.min(
+    Math.round((typedText.length / targetText.length) * 100),
+    100
+  )
  
   const handleStart = () => {
     setTypedText('')
     setElapsedTime(0)
     setTargetText(getRandomPassage(targetText))
     setHasStarted(true)
+    setShowPassage(true)
     setIsRunning(true)
   }
   const getRandomPassage = (currentPassage) => {
@@ -58,6 +65,7 @@ function App() {
       setElapsedTime(0)
       setIsRunning(false)
       setHasStarted(false)
+      setShowPassage(false)
   }
 
   useEffect(() => {
@@ -72,6 +80,11 @@ function App() {
 
     return () => clearInterval(timer)
   }, [isRunning, time])
+  useEffect(() => {
+    if (hasStarted && showPassage) {
+      textareaRef.current?.focus()
+    }
+  }, [hasStarted, showPassage])
 
   const calculateAccuracy = () => {
     if (typedText.length === 0) {
@@ -95,6 +108,40 @@ function App() {
       (correctCharacters / typedText.length) * 100
     )
   }
+  const calculateCorrectCharacters = () => {
+    let correctCharacters = 0
+
+    const charactersToCheck = Math.min(
+      typedText.length,
+      targetText.length
+    )
+
+    for (let i = 0; i < charactersToCheck; i++) {
+      if (typedText[i] === targetText[i]) {
+        correctCharacters++
+      }
+    }
+
+    return correctCharacters
+  }
+
+  const calculateErrors = () => {
+    let errors = 0
+
+    const charactersToCheck = Math.min(
+      typedText.length,
+      targetText.length
+    )
+
+    for (let i = 0; i < charactersToCheck; i++) {
+      if (typedText[i] !== targetText[i]) {
+        errors++
+      }
+    }
+
+    return errors
+  }
+
   const calculateWPM = () => {
     if (elapsedTime === 0 || typedText.length === 0) {
       return 0
@@ -166,9 +213,24 @@ function App() {
         </div>
       </div>
 
+      <div className="progress-container">
+        <div className="progress-info">
+          <span>Progress</span>
+          <span>{progress}%</span>
+        </div>
+
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+
       <div className="text-display">
-        {targetText.split('').map((character, index) => {
-          const typedCharacter = typedText[index]
+        {showPassage ? (
+          targetText.split('').map((character, index) => {
+            const typedCharacter = typedText[index]
 
           if (!typedCharacter) {
             return (
@@ -194,18 +256,36 @@ function App() {
               {character}
             </span>
           )
-        })}
+        })
+        ) : (
+          <div className="ready-message">
+            <h2>Ready?</h2>
+            <p>Choose your difficulty and click Start Test.</p>
+          </div>
+        )}
+      </div>
+
+      <div className="typing-info">
+        <span>
+          Characters: {typedText.length}/{targetText.length}
+        </span>
+
+        <span>
+          {targetText.length - typedText.length} remaining
+        </span>
       </div>
 
       <textarea
+        ref={textareaRef}
         placeholder="Start typing here..."
         value={typedText}
-        disabled={!hasStarted || time === 0  || typedText === targetText}
+        maxLength={targetText.length}
+        disabled={!hasStarted || time === 0  || typedText.length === targetText.length}
         onChange={(e) => {
           const value = e.target.value
           setTypedText(value)
 
-          if (value === targetText) {
+          if (value.length === targetText.length) {
             setIsRunning(false)
           }
         }}
@@ -223,6 +303,16 @@ function App() {
             <div>
               <span>Accuracy</span>
               <strong>{calculateAccuracy()}%</strong>
+            </div>
+
+            <div>
+              <span>Correct</span>
+              <strong>{calculateCorrectCharacters()}</strong>
+            </div>
+
+            <div>
+              <span>Errors</span>
+              <strong>{calculateErrors()}</strong>
             </div>
 
             <div>
